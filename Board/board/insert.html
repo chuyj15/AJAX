@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 쓰기</title>
+    <link rel="stylesheet" href="../css/reset.css">
+    <!-- jsp가 아니라 따로 루트경로를 해줄 수 있는 방법이 없습니당.ㅠ -->
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- 사이드 바 -->
+        <aside id="sidebar">
+            <div class="top flex main-end">
+                <a href="javascript:;" id="btn-close">
+                    <span>close</span>
+                </a>
+            </div>
+            <ul >
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../board/list.html">Board</a></li>
+                <li><a href="../gallery/list.html">Gallery</a></li>
+            </ul>
+        </aside>
+
+    <!-- 헤더 -->
+    <header>
+        <!-- 로그인, 회원가입 -->
+        <div class="util"></div>
+        <!-- 메인 메뉴 -->
+        <div class="menu">
+            <nav>
+                <ul class="">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../board/list.html">Board</a></li>
+                    <li><a href="../gallery/list.html">Gallery</a></li>
+                </ul>
+            </nav>
+        </div>
+
+    </header>
+
+
+    <!-- 메인 -->
+    <section class="main container">
+        <div class="inner">
+            <!-- 제목 영역 -->
+            <div class="main-title">
+                <h1>게시글 쓰기</h1>
+                <p>커뮤니티 게시글 등록을 요청합니다.</p>
+            </div>
+            <!-- 게시글 입력 -->
+            <form action="http://192.168.30.119:8080/api/board" method="post">
+                <table class="board">
+                    <tr>
+                        <td class="label">제목</td>
+                        <td class="data">
+                            <input type="text" name="title" id="title" class="input-text">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">작성자</td>
+                        <td class="data">
+                            <input type="text" name="writer" id="writer" class="input-text">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">내용</td>
+                        <td class="data">
+                            <textarea name="content" id="content" cols="30" rows="10" class="input-textarea"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label">파일</td>
+                        <td class="data">
+                            <input type="file" name="file" id="file" multiple>
+                        </td>
+                    </tr>
+                </table>
+            
+            <div class="btn-box">
+                <div class="item">
+                    <a href="list.html" class="btn">목록</a>
+                </div>
+                <div class="item">
+                    <a href="javascript:;" id="btn-insert">등록</a>
+                    <!-- <input type="submit" class="btn" value="등록"> -->
+                </div>
+            </div>
+        </form>
+
+        </div>
+    </section>
+
+    <!-- 스크립트 -->
+    <!-- 제이쿼리 포함시키는 코드 -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="../js/main.js"></script>
+
+    <script>
+        
+        //등록버튼 클릭 이벤트
+        $('#btn-insert').on('click', function(){
+            //게시글 등록 요청
+            //FormData 객체를 사용하면 웹 폼에서 사용자가 입력한 데이터를 수집하고, 이 데이터를 서버에 전송할 수 있습니다.
+            let formData = new FormData()           //폼 데이터 객체
+            //쓴 내용을 가져옴
+            let title = $('#title').val()
+            let writer = $('#writer').val()
+            let content = $('#content').val()
+
+            //파일 입력 가져오기
+            let file = $('#file')[0]
+            let files = file.files
+
+            formData.append('title', title)
+            formData.append('writer', writer)
+            formData.append('content', content)
+
+            //파일데이터 추가
+            for (let i = 0; i < files.length; i++) {
+                formData.append('file[]', files[i])
+            }
+
+            // let data = {
+            //     'title' : title,
+            //     'writer' : writer,
+            //     'content' : content
+            // }
+
+            let url = 'http://192.168.30.119:8080/api/board'
+            $.ajax({
+                url : url,
+                type : 'POST',
+                data : formData,
+                //data : JSON.stringify(data),
+                //contentType 옵션을 false로 설정하여 jQuery가 자동으로 Content-Type 헤더를 설정하지 않도록 합니다.
+                contentType : false,
+                //contentType : 'application/json',
+
+                //데이터컨텐츠타입 자동 변환 여부
+                processData : false,  //(GET방식에만 해당하는 설명) 데이터를 쿼리스트링으로 변환 여부
+                //기본값은 true임. 
+                //true : contentType : applicaton/x-www-form-urlencoded 
+                //false : contentType : 내가 꼭 지정해줘야함! 그 속성이 꼭 있어야 합니당.
+
+                success : function(response){
+                    alert(response)
+                    if ( response == 'SUCCESS'){
+                        alert('등록이 완료되었습니다.')
+                        //목록 페이지로 이동
+                        location.href = 'list.html'
+                    }
+                }, 
+                error           : function(request, status, error){
+                    alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                }
+            })
+        })
+
+    </script>
+</body>
+</html>
